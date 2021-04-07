@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Video Call Demo</title>
+    <link rel="stylesheet" href="./styles/style.css">
+</head>
+
+<body>
+    <h1>
+        Video Call Demo<br><small style="font-size: 14pt">Powered by Agora.io</small>
+    </h1>
+
+    <p>App id : <input type="text" id="app-id" value=""></p>
+    <p>Channel : <input type="text" id="channel" value=""></p>
+    <p>Token : <input type="text" id="token" placeholder="(optional)" value=""></p>
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="startRecording" disabled=true>Start Recording</button>
+    <button id="stopRecording" disabled=true>Stop Recording</button>
+
+    <h4>My Feed :</h4>
+    <div id="me"></div>
+
+    <h4>Remote Feeds :</h4>
+    <div id="remote-container">
+
+    </div>
+
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.3.0.js"></script>
+    <script src="scripts/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+*{
+    font-family: sans-serif;
+}
+h1,h4,p{
+    text-align: center;
+}
+button{
+    display: block;
+    margin: 5px auto;
+}
+#remote-container video{
+    height: auto;
+    position: relative !important;
+}
+#me{
+    position: relative;
+    width: 50%;
+    margin: 0 auto;
+    display: block;
+}
+#me video{
+    position: relative !important;
+}
+#remote-container{
+    display: flex;
+}
