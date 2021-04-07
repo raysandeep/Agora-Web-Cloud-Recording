@@ -22,13 +22,13 @@ So, I started working on Cloud Recording with Agora to make sure I won’t face 
 
 We are having a small client-server architecture. All the communication will be happening through Rest APIs.
 
-**Video Calling Website: **Frontend will be responsible for starting and stopping the recording.
+**Video Calling Website:** Frontend will be responsible for starting and stopping the recording.
 
-**GoLang Backend: **A backend server that has all the access keys and secrets required for recording.
+**GoLang Backend:** A backend server that has all the access keys and secrets required for recording.
 
-**Agora Cloud Recording Server: **Responsible for uploading all the media fragments to AWS S3 Bucket.
+**Agora Cloud Recording Server:** Responsible for uploading all the media fragments to AWS S3 Bucket.
 
-**AWS S3 Bucket: **A bucket to store media fragments.
+**AWS S3 Bucket:** A bucket to store media fragments.
 
 ## Agora Setup
 
@@ -81,11 +81,13 @@ We are having a small client-server architecture. All the communication will be 
 2.  To deploy click on the below button and fill in your environment variables.
 
 [![Click the deploy button above to start](https://cdn-images-1.medium.com/max/2000/0*Um1JR2yL1yJcFn1h.png)](https://heroku.com/deploy?template=https://github.com/raysandeep/Agora-Cloud-Recording-Example/)
+
 _Click the deploy button above to start_
 
 3. Let’s import your postman collection.
 
 [![Click the postman button to open docs.](https://cdn-images-1.medium.com/max/2000/1*htvlsa6XJ-A4vYWsOGW4-Q.jpeg)](https://documenter.getpostman.com/view/8653133/TzCS4RCq)
+
 _Click the postman button to open docs._
 
 4. Hurray! Now, your backend setup is completed. If you want to test your backend you can call the APIs from the postman and use the [web demo frontend](https://webdemo.agora.io/agora-web-showcase/) to join the call.
@@ -98,35 +100,86 @@ Download the base code for the frontend. We will be using Agora NG SDK for this 
 
 Let’s add base URL on the top of the scripts.js file.
 
-<iframe src="https://gist.github.com/raysandeep/c217f5e1d9d50234f2b6d9400608d64d" frameborder="0" allowfullscreen="true"> </iframe>
+    let baseUrl = "https://cloud-recorder.herokuapp.com";
 
 Let’s make a helper function to fetch tokens from our backend.
 
-<iframe src="https://medium.com/media/286f680d9c790cd6fe2f5bfe7f173ba2" frameborder=0></iframe>
+    async function getToken(channelName) {
+        const data = await fetch(
+            `${baseUrl}/api/get/rtc/${channelName}`
+        ).then((response) => response.json());
+        return data;
+    }
 
 Now, call the getToken() function after fetching the channelName from the form. And assign token & uid to two different variables.
 
-<iframe src="https://medium.com/media/f077a67352c5b4ccdc37c8e7c452a8da" frameborder=0></iframe>
+    let appId = document.getElementById("app-id").value;
+    let channelId = document.getElementById("channel").value;
+    let data = await getToken(channelId);
+    let token = data.rtc_token;
+    let uid = data.uid;
 
 Edit client.join method and pass uid & token .
 
-<iframe src="https://medium.com/media/8d6949259af901d130b488c25dec8aad" frameborder=0></iframe>
+    const _uid = await client.join(appId, channelId, token, uid);
 
 Add 2 buttons to the frontend namely Start Recording & Stop Recording in index.html file. By default both the buttons are disabled.
 
-<iframe src="https://medium.com/media/0e6a88124feea41c18eebd2193bbfdd7" frameborder=0></iframe>
+    <button id="startRecording" disabled=true>Start Recording</button>
+    <button id="stopRecording" disabled=true>Stop Recording</button>
 
 After publishing local streams, enable the Start Recording button.
 
-<iframe src="https://medium.com/media/a8d505239a9e6507fced8482a335c7bd" frameborder=0></iframe>
+    // Initialize the start recording button
+    document.getElementById("startRecording").disabled = false;
 
 Let’s make a onclick event listeners for Start Recording button.
 
-<iframe src="https://medium.com/media/eb32eb7b742e3ce4e8e2edb5695f5022" frameborder=0></iframe>
+    document.getElementById("startRecording").onclick = async function () {
+        let channelId = document.getElementById("channel").value;
+        // request your backend to start call recording.
+        startcall = await fetch(`${baseUrl}/api/start/call`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({ channel: channelId }),
+        }).then((response) => response.json());
+        console.log(startcall.data);
+        // Initialize the stop recording button.
+        initStopRecording(startcall.data);
+        // Disable the start recording button.
+        document.getElementById("startRecording").disabled = true;
+    };
 
 initStopRecording is defined at the end of the code for stopping call recording.
 
-<iframe src="https://medium.com/media/e33452e6dd27a9c331bf50df2b1ea3d1" frameborder=0></iframe>
+    function initStopRecording(data) {
+        // Disable Stop Recording Button
+        const stopBtn = document.getElementById("stopRecording");
+        // Enable Stop Recording button
+        stopBtn.disabled = false;
+        // Remove previous event listener
+        stopBtn.onclick = null;
+        // Initializing our event listener
+        stopBtn.onclick = async function () {
+            // Request backend to stop call recording
+            stopcall = await fetch(`${baseUrl}/api/stop/call`, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }).then((response) => response.json());
+            console.log(stopcall.message);
+
+            // Disable Stop Recording Button
+            stopBtn.disabled = true;
+            // Enable Start Recording Button
+            document.getElementById("startRecording").disabled = false;
+        };
+    }
 
 ## Conclusion
 
@@ -134,12 +187,12 @@ Hurray! Now, I can record my calls during my project review! The code base for t
 
 > Note: The deployed backend has token server embeded into it. So, you don’t need to deploy a new token server!
 
-**_Not sure how to merge cloud recorded files? _**
+**Not sure how to merge cloud recorded files?**
 
 Check this out!
 [raysandeep/Agora-Cloud-Recording-Merger](https://github.com/raysandeep/Agora-Cloud-Recording-Merger/)
 
-**_Stuck somewhere? _**
+**Stuck somewhere?**
 
 Join our Slack community [here](https://join.slack.com/t/agoraiodev/shared_invite/zt-e7ln476c-pfWWYMs40Y7GMPz2i26pwA) to learn about product updates, participate in the beta programs, and engage in meaningful conversations with other developers.
 
