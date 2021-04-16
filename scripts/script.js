@@ -1,6 +1,6 @@
 // JS reference to the container where the remote feeds belong
 let remoteContainer = document.getElementById("remote-container");
-let baseUrl = "https://cloud-recorder.herokuapp.com";
+let baseUrl = "";
 
 /**
  * @name addVideoContainer
